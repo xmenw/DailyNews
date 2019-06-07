@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>修改新闻</title>
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/reset.css">
+	<link rel="icon" href="../static/news.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="../static/news.png" type="image/x-icon"/>
+	<script src="../js/ajax.js"></script>
+	<style>
+		h1 {
+			text-align: center;
+			margin-top: 30px;
+		}
+		form {
+			margin-top: 60px;
+		}
+		input {
+			margin: 10px 0;
+		}
+		textarea {
+			margin: 10px 0;
+			resize: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>新闻修改</h1>
+		<form 
+			class="form col-md-6 col-sm-8 col-xs-10 col-md-offset-3 col-sm-offset-2 col-xs-offset-1"
+		>
+			<input type="hidden" name="id" class="id"/>
+			<input type="text" name="title" class="title form-control" placeholder="新闻标题" autocomplete="off">
+			<input type="text" name="pic" class="pic form-control" placeholder="新闻照片" autocomplete="off">
+			<select name="name" id="select" class="select form-control">
+				
+			</select>
+			<textarea name="text" id="textarea" cols="30" rows="6" class="textarea form-control" placeholder="新闻内容"></textarea>
+			<button class="add btn btn-success btn-block">修改</button>
+		</form>
+	</div>
+	<script>
+		let id = location.href.split("?")[1].split("=")[1];
+		let btnAdd = document.getElementsByClassName("add")[0];
+		let btnTitle = document.getElementsByClassName("title")[0];
+		let btnPic = document.getElementsByClassName("pic")[0];
+		let btnSelect = document.getElementsByClassName("select")[0];
+		let btnTextarea = document.getElementsByClassName("textarea")[0];
+		let btnId = document.getElementsByClassName("id")[0];
+		let select = document.getElementsByClassName("select")[0];
+			
+		/*获取新闻标题*/
+		fn1("../php/queryAllNames.php")
+			.then(res=>{
+				setNameValues(res);
+			});
+
+		function setNameValues(data) {
+			let frage = document.createDocumentFragment();
+			for (var i = 0; i < data.length; i++) {
+				let option = document.createElement("option");
+				option.innerText = data[i][0];
+				option.setAttribute("value", data[i][0]);
+				frage.appendChild(option);
+			}
+			select.appendChild(frage);
+		}
+
+		// 先获取数据
+		fn1("../php/newDetail.php", `id=${id}`)
+			.then(res=>{	
+				if(res){
+					btnId.value = res[0][0];
+					btnTitle.value = res[0][1];
+					btnPic.value = res[0][3];
+					btnSelect.value = res[0][4];
+					btnTextarea.value = res[0][2];
+				} else {
+					alert("添加失败!");
+				}
+			});
+
+		btnAdd.onclick = function (e) {
+			e.preventDefault();
+			let titleVal = transfer( btnTitle.value ),
+				picVal = transfer( btnPic.value ),
+				selectVal = transfer( btnSelect.value ),
+				textareaVal = transfer( btnTextarea.value ),
+		
+				idVal = transfer( btnId.value );
+			fn1("../php/updateNew.php", `id=${id}&&title=${titleVal}&&pic=${picVal}&&name=${selectVal}&&text=${textareaVal}`)
+				.then(res=>{
+					if(res){
+						btnTitle.value = '';
+						btnPic.value = '';
+						btnSelect.value = '军事';
+						btnTextarea.value = '';
+						alert("修改成功!");
+					} else {
+						alert("修改失败!");
+					}
+				});
+		};
+
+		function transfer(text) {
+			return text.replace(/</gi, "&lt;").replace(/>/gi, "&gt;");
+		}
+	</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

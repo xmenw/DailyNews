@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>上传新闻</title>
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/reset.css">
+	<link rel="icon" href="../static/news.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="../static/news.png" type="image/x-icon"/>
+	<script src="../js/ajax.js"></script>
+	<style>
+		h1 {
+			text-align: center;
+			margin-top: 30px;
+		}
+		form {
+			margin-top: 60px;
+		}
+		input {
+			margin: 10px 0;
+		}
+		textarea {
+			margin: 10px 0;
+			resize: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>新闻上传</h1>
+		<form 
+			class="form col-md-6 col-sm-8 col-xs-10 col-md-offset-3 col-sm-offset-2 col-xs-offset-1"
+			method="POST" 
+			enctype="multipart/form-data"
+			action="../php/addNews.php" 
+		>
+			<input type="text" name="title" class="title form-control" placeholder="新闻标题" autocomplete="off">
+			<input type="file" name="pic" class="pic form-control" />
+			<select name="name" id="select" class="select form-control">
+				<option value="军事">军事</option>
+				<option value="科技">科技</option>
+				<option value="财经">财经</option>
+				<option value="娱乐">娱乐</option>
+				<option value="体育">体育</option>
+				<option value="汽车">汽车</option>
+				<option value="房产">房产</option>
+				<option value="国内">国内</option>
+				<option value="国际">国际</option>
+				<option value="互联网">互联网</option>
+			</select>
+			<textarea name="text" id="textarea" cols="30" rows="6" class="textarea form-control" placeholder="新闻内容"></textarea>
+			<button class="add btn btn-success btn-block">添加</button>
+			<input type="reset" class="btn btn-info btn-block" value="取消" />
+		</form>
+	</div>
+	<script>
+		let btnAdd = document.getElementsByClassName("add")[0];
+		let btnTitle = document.getElementsByClassName("title")[0];
+		let btnPic = document.getElementsByClassName("pic")[0];
+		let btnSelect = document.getElementsByClassName("select")[0];
+		let btnTextarea = document.getElementsByClassName("textarea")[0];
+		let select = document.getElementsByClassName("select")[0];
+		
+
+		// btnAdd.onclick = function (e) {
+		// 	// e.preventDefault();
+		// 	let titleVal = transfer( btnTitle.value ),
+		// 		picVal = transfer( btnPic.value ),
+		// 		selectVal = transfer( btnSelect.value ),
+		// 		textareaVal = transfer( btnTextarea.value );
+		// 	if (titleVal && picVal && selectVal && textareaVal) {
+		// 		fn1("../php/addNews.php", `title=${titleVal}&&pic=${picVal}&&name=${selectVal}&&text=${textareaVal}`)
+		// 			.then(res=>{
+		// 				if(res){
+		// 					btnTitle.value = '';
+		// 					btnPic.value = '';
+		// 					btnSelect.value = '军事';
+		// 					btnTextarea.value = '';
+		// 					alert("添加成功!");
+		// 				} else {
+		// 					alert("添加失败!");
+		// 				}
+		// 			});
+		// 	}else {
+		// 		alert("提交失败，请检查您的输入!");
+		// 	}
+		// };
+
+		function transfer(text) {
+			return text.replace(/</gi, "&lt;").replace(/>/gi, "&gt;");
+		}
+	</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

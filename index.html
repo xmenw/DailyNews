@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>今日新闻</title>
+</head>
+<link rel="stylesheet" href="./css/bootstrap.min.css">
+<link rel="stylesheet" href="./css/reset.css">
+<link rel="icon" href="static/news.png" type="image/x-icon" />
+<link rel="shortcut icon" href="static/news.png" type="image/x-icon"/>
+<script src="./js/ajax.js"></script>
+<style>
+	@keyframes fade {
+		to {
+			opacity: 0;
+		}
+	}
+	body {
+		height: auto;
+		background-color: #f3f3f3;
+	}
+	a:hover {
+		text-decoration: none;
+	}
+	h1 {
+		letter-spacing: 13px;
+		text-align: center;
+	}
+	.container {
+		padding-top: 20px;
+	}
+	.search {
+		position: relative;
+		width: 100%;
+		height: 30px;
+		margin-bottom: 10px;
+	}
+	.search .res {
+		position: absolute;
+		right: 0;
+		z-index: 2;
+		height: 100%;
+		width: 410px;
+	}
+	.search input {
+		float: right;
+		width: 410px;
+		height: 30px;
+		margin-top: 5px;
+		text-indent: 1em;
+		outline: none;
+		border: none;
+	}
+	.search .newlist {
+		margin-top: 5px;
+		z-index: 2;
+		background-color: #fff;
+	}
+	.newlist .list{
+		height: 40px;
+		width: 100%;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		line-height: 40px;
+	}
+	.newlist .list:hover {
+		background-color: #64a1d5;
+	}
+	.list:hover {
+		background-color: #64da;
+	}
+	/*轮播图*/
+	.carousel {
+		position: relative;
+	}
+	.carousel .wrap{
+		height: 180px;
+		background-color: #5158;
+	}
+	.wrap .cont{
+		display: none;
+		width: 100%;
+		height: 100%;
+	}
+	.cont.active {
+		display: block;
+	}
+	.cont span {
+		position: absolute;
+		width: 100%;
+		padding: 0 5px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		z-index: 2;
+		color: #fff; 
+	}
+	.cont img {
+		width: 100%;
+		height: 100%;
+	}
+	.ul {
+		display: none;
+		position: absolute;
+		bottom: 5px;
+		width: 100%;
+		text-align: center;
+	}
+	.ul li {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		margin: 0 4px;
+		cursor: pointer;
+		border-radius: 50%;
+		background-color: #fff;
+	}
+	.ul li.active {
+		background-color: #00f;
+	}
+	.carousel:hover .ul,
+	.carousel:hover .lr {
+		display: inline-block;
+	}
+	.lr {
+		display: none;
+		position: absolute;
+		top: 50%;
+		width: 100%;
+		margin-top: -15px;
+	}
+	.left,
+	.right {
+		width: 30px;
+		height: 30px;
+		cursor: pointer;
+		background-size: 100%;
+	}
+	.left {
+		float: left;
+		background-image: url(static/left.png);
+	}
+	.right {
+		float: right;
+		background-image: url(static/right.png);
+	}
+	/*头部样式*/
+	.header {
+		margin-bottom: 10px;
+		font-size: 1.3em;
+		box-shadow: 0 5px 5px rgba(0, 0, 0, .3);
+		border-bottom: 1px solid black;
+		border-radius: 6px;
+		background: linear-gradient(to left, 
+			#ce5757,
+			#c738c7,
+			#13cc66
+		);
+	}
+	.header li {
+		float: left;
+		margin: 0 5px;
+		color: #fff;
+		cursor: pointer;
+	}
+	.header li.active {
+		color: #762;
+		text-decoration: underline;
+	}
+	.wrapper {
+		margin-bottom: 30px;
+	}
+	/*每列样式*/
+	.column {
+		min-height: 250px;
+		min-width: 280px;	
+		max-width: 380px;
+		height: 300px;
+		margin: 10px 0px;
+		overflow: hidden;
+	}
+	.column .title {
+		height: 15%;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		background-color: #fff;
+		border-bottom: 1px solid #ce5757;
+	}
+	.column h2{
+		height: 100%;
+		max-height: 100%;
+		padding: 10px 5px;
+		font-size: 20px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.column .img {
+		width: 100%;
+		height: 85%;
+		max-height: 85%;
+		overflow: hidden;
+	}
+	.column .img img{
+		width: 100%;
+		height: 100%;
+	}
+	.column:hover img{
+		transform: scale(1.1);
+		transition: transform .8s;
+	}
+	.column .detail {
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+		cursor: pointer;
+	}
+	.action li {
+		float: right;
+		margin: 0 10px;
+	}
+	.action li:first-child {
+		float: left;
+	}
+	.action li:first-child span {
+		color: #f00;
+		font-style: italic;
+	}
+	.footer {
+		text-align: center;
+		font-size: 1em;
+		margin: 30px 0;
+	}
+	.about {
+		padding: 10px;
+		text-align: center;
+		background-color: #e1e1e1;
+	}
+	.hot {
+		padding: 0;
+		margin: 0;
+	}
+	.hot li {
+		height: 30px;
+		line-height: 30px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		border-bottom: 1px solid #e1e1e1; 
+	}
+	.hot li span {
+		margin-right: 10px;
+	}
+	.hot li:nth-child(1){
+		color: #f00;
+	}
+	.hot li:nth-child(2){
+		color: #F30;
+	}
+
+	.hot li:nth-child(3){
+		color: #D42F;
+	}
+
+	.hot li:nth-child(4){
+		color: #D92F;
+	}
+
+	.hot li:nth-child(5){
+		color: #C93F;
+	}
+</style>
+<body>
+	<div class="container">
+		<header>
+			<h1>今日新闻</h1>
+			<div class="search row">
+				<div class="res">
+					<input type="text" class="searchIn form-control" autocomplete="off" placeholder="搜索新闻">
+					<ul class="newlist">
+					</ul>
+				</div>
+			</div>
+		</header>
+		<div class="row">
+			<nav>
+				<ul class="header col-md-12 col-sm-12 col-xs-12">
+					<li class="active">
+						全部
+					</li>
+					<li>
+						国内
+					</li>
+					<li>
+						国际
+					</li>
+					<li>
+						科技
+					</li>
+					<li>
+						军事
+					</li>
+					<li>
+						财经
+					</li>
+					<li>
+						娱乐
+					</li>
+					<li>
+						体育
+					</li>
+					<li>
+						互联网
+					</li>
+					<li>
+						汽车
+					</li>
+					<li>
+						房产
+					</li>
+				</ul>
+			</nav>
+			<ul class="action">
+				<li>欢迎您 <span class="username">新用户</span></li>
+				<li>
+					<a href="./html/regist.html">注册</a>
+				</li>
+				<li>
+					<a href="./html/login.html">登录</a>
+				</li>
+			</ul>
+		</div>
+		<article>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="carousel">
+						<ul class="wrap">
+							
+						</ul>
+						<ul class="ul">
+							
+						</ul>
+						<div class="lr">
+							<span class="left"></span>
+							<span class="right"></span>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<aside>
+						<h2>热点新闻</h2>
+						<ol class="hot">
+
+						</ol>				
+					</aside>
+				</div>
+			</div>
+			<div class="wrapper row">
+				正在加载数据......
+			</div>
+		</article>
+			<div class="footer">没有数据了</div>
+	</div>
+	<footer>
+		<div class="about">
+		  	<p class="about-p-top">
+		  		<span><a href="##">关于本站</a></span>
+		  		<span><a href="##">合作伙伴</a></span>
+		  		<span><a href="##">营销中心</a></span>
+		  		<span><a href="##">廉政举报</a></span>
+		  		<span><a href="##">联系客服</a></span>
+		  		<span><a href="##">开放平台</a></span>
+		  		<span><a href="##">诚征英才</a></span>
+		  		<span><a href="##">联系我们</a></span>
+		  		<span><a href="##">网站地图</a></span>
+		  		<span><a href="##">法律声明及隐私权政策</a></span>
+		  		<span><a href="##">知识产权</a></span>
+		        <span><b>|</b></span>
+		  		<span>
+		            <em>© 2019-现在 xmw.com 版权所有</em>
+		  	    </span>
+		  	</p>
+		  	<p class="about-p-center">
+		  		<span><a href="##">网络文化经营许可证：浙网文[2019]0268-027号</a></span>
+		  		<span><b>|</b></span>
+		  		<span><a href="##">增值电信业务经营许可证：浙B2-20080224</a></span>
+		        <span><b>|</b></span>
+		  		<span>
+		            <em>互联网违法和不良信息举报电话：0571-81683755 blxxjb@xmw-inc.com</em>
+		  	    </span>
+		  	</p>
+			<p class="about-p-bot">
+				<span class="pic"></span>
+			    <span><a href="##">浙公网安备 33010002000078号</a></span>
+			    <span><b>|</b></span>
+			    <span>
+		         <em>（浙）网械平台备字[2018]第00004号</em>
+		        </span>
+		        <span><b>|</b></span>
+			    <span><a href="##">出版物网络交易平台服务经营备案证：新出发浙备字第002号</a></span>
+		        <span><b>|</b></span>
+		    </p>
+		</div>
+	</footer>
+	<script>
+		let data;
+		let res = [];
+		let row = document.getElementsByClassName("wrapper")[0];
+		let frage = document.createDocumentFragment();
+		let aArr = document.querySelectorAll(".header li");
+		let username = document.querySelectorAll(".username");
+		let searchIn = document.querySelectorAll(".searchIn");/*搜索*/
+		let newList = document.querySelectorAll(".newlist"); /*新闻列表*/
+		let hotNews = document.querySelector(".hot"); /*热点新闻*/
+		let carouselWrap = document.querySelector(".wrap"); /*轮播图容器*/
+		let carousel = document.querySelector(".carousel"); /*轮播图容器*/
+		let ul = document.querySelector(".ul"); /*轮播图圆点容器*/
+		let left = document.querySelector(".left"); /*轮播图左按钮*/
+		let right = document.querySelector(".right"); /*轮播图右按钮*/
+		let cont; /*轮播图*/
+		let begin = 1;
+		let index = 0;
+		let timer;
+		let dot;
+		fn1(`./php/database.php`, `name=全部&begin=0`).then(res => createDom(res));
+		for (var i = 0; i < aArr.length; i++) {
+			aArr[i].onclick = function () {
+				for (var i = 0; i < aArr.length; i++) {
+					aArr[i].setAttribute("class", "");
+				}
+				this.classList.add("active");
+				let text = this.innerText;
+				res=[];
+				begin = 1;
+				fn1(`./php/database.php`, `name=${text}&begin=0`).then(res => createDom(res));
+			}
+		}
+		function createDom(data) {
+			res = res.concat(data.slice(0, data.length - 1));
+			row.innerHTML = '';
+			for (var i = 0; i < res.length; i++) {
+				let a = document.createElement("a");
+				a.setAttribute("href", `./html/newsDetail.html?id=${res[i][0]}`);
+				a.setAttribute("class", "detail");
+				a.setAttribute("target", "_blank");
+				// 列
+				let column = document.createElement("div");
+				column.setAttribute("class", "column col-md-4 col-sm-6 col-xs-6");
+				// 标题
+				let divTitle = document.createElement("div");
+				divTitle.setAttribute("class", "title");
+				// 图片外容器
+				let divImg = document.createElement("div");
+				divImg.setAttribute("class", "img");
+				// 图片
+				let img = document.createElement("img");
+				// 标题
+				let h2 = document.createElement("h2");
+				let text = document.createTextNode(res[i][1]);
+				//设置数据
+				img.setAttribute("src", res[i][2].split(",")[0]);
+				img.setAttribute("alt", res[i][1]);
+				a.appendChild(divTitle);
+				divTitle.appendChild(h2);
+				h2.appendChild(text);
+				a.appendChild(divImg);
+				divImg.appendChild(img);
+				column.appendChild(a);
+				frage.appendChild(column);
+			}
+			username[0].innerText = data[data.length - 1] || '新用户';
+			row.appendChild(frage);
+		}
+
+		/*加载热点新闻*/
+		fn1(`./php/hotNews.php`)
+			.then(data => {
+					createHotNewsDom(data);
+					createCarouselDom(data);
+				}
+			);
+		/*创建热点新闻*/
+		function createHotNewsDom(data){
+			let frage = document.createDocumentFragment();
+			for (var i = 0; i < data.length; i++) {
+				let li = document.createElement("li");
+				let a = document.createElement("a");
+				let span = document.createElement("span");
+				let spanNum = document.createElement("span");
+				span.innerText = i + 1;
+				spanNum.innerText = data[i][2];
+				a.setAttribute("href", `./html/newsDetail.html?id=${data[i][0]}`);
+				a.setAttribute("target", `_blank`);
+				a.innerText = data[i][1];
+				li.appendChild(span);
+				li.appendChild(a);
+				frage.appendChild(li);
+			}
+			hotNews.appendChild(frage);
+		}
+		/*创建轮播*/
+		function createCarouselDom(data){
+			let frage = document.createDocumentFragment();
+			for (var i = 0; i < data.length; i++) {
+				let li = document.createElement("li");
+				let dotli = document.createElement("li");
+				let a = document.createElement("a");
+				let img = document.createElement("img");
+				let span = document.createElement("span");
+				data[i][3] = data[i][3].split(",")[0];
+				a.setAttribute("href", `./html/newsDetail.html?id=${data[i][0]}`);
+				a.setAttribute("target", `_blank`);
+				img.setAttribute("src", `${ data[i][3] }`);
+				li.setAttribute("class", "cont");
+				if(i == index){
+					li.classList.add("active");
+					dotli.setAttribute("class", `active`);
+				}
+				span.innerText = data[i][1];
+				a.appendChild(span);
+				a.appendChild(img);
+				li.appendChild(a);
+				frage.appendChild(li);
+				ul.appendChild(dotli);
+			}
+			carouselWrap.appendChild(frage);
+			cont = document.querySelectorAll(".cont");
+			dot = document.querySelectorAll(".ul li");
+			start(true, index);
+			bindClick();
+		}
+
+		function bindClick(){
+			let dot = document.querySelectorAll(".ul li");
+			let len = dot.length;
+			for (var i = 0; i < len; i++) {
+				dot[i].onclick = (function(j){
+					return ()=>{
+						start(true, j);
+					};
+				})(i);
+			}
+			right.onclick = function(){
+				start(true, index);
+			};
+			left.onclick = function(){
+				start(false, index);
+			};
+		}
+		/**
+		 * [start description]
+		 * @param  {[type]} flag [控制方向]
+		 * @param  {[type]} s    [位置]
+		 * @return {[type]}      [description]
+		 */
+		function start(flag, s) {
+			index = s;
+			play(flag);
+			clearInterval(timer);
+			timer = setInterval(function(){
+				play(flag);
+			}, 2000);
+		}
+
+		function play(flag){
+			let len = cont.length;
+			if(index >= len){
+				index = 0;
+			}
+			if(index < 0){
+				index = len - 1;
+			}
+			for (var i = 0; i < len; i ++) {
+				cont[i].classList.remove("active");
+				dot[i].classList.remove("active");
+			}
+			cont[index].classList.add("active");
+			dot[index].classList.add("active");
+			if(flag){
+				 ++ index;
+			}else {
+				 -- index;
+			}
+		}
+		
+		carousel.onmouseenter = function(){
+			clearInterval(timer);
+		}
+		carousel.onmouseleave = function(){
+			clearInterval(timer);
+			timer = setInterval(function(){
+				play(true);
+			}, 2000);
+		}
+
+		/*异步加载*/
+		function checkImgs(columns) {
+			let column = Array.from(columns);
+			let len = column.length;
+			if (isInSight()) {
+				loadImg();
+				begin ++;
+				return;	
+			}    
+		}
+		function loadImg(e) {
+			let text = document.getElementsByClassName('active')[0].innerText;
+			fn1(`./php/database.php`, `name=${text}&begin=${begin}`)
+				.then(res => createDom(res));
+		}	
+			
+		function isInSight() {
+		  	const clientHeight = window.innerHeight;
+		  	let top = document.documentElement.scrollTop;
+		  	return ((clientHeight + top) / clientHeight) >= begin;
+		}
+		
+		function throttle(cb, delay){
+	        var now,
+	            last = 0;
+	        return function(e){
+	            now = Date.now();
+	            if(now - last >= delay){
+	                cb.apply(this, [e]);
+	                last = now;
+	            }
+	        }
+	    }
+
+	    window.onscroll = function () {
+	    	let column = document.querySelectorAll(".column");
+	    	if(column.length > 0){
+	    		throttle(checkImgs(column), 300);
+	    	}
+	    }
+	    
+	    let allNews = [];
+	    fn1(`./php/queryAllNews.php`).then(res => allNews = res);
+
+	    searchIn[0].oninput = boundance(searchNews, 300);
+
+	    function boundance(fn, time) {
+	    	let	timer;
+    		return function (e) {
+    			clearTimeout(timer);
+    			timer = setTimeout(()=> {
+    				fn.apply(this, [e]);
+    			}, time);
+	    	}
+	    }
+
+	    function searchNews(e) {
+			let inpVal = this.value.trim();
+			let arrNews = [];
+			let cloneAllNews;
+			if(inpVal.length > 0){
+				let reg = new RegExp(inpVal, "gi");
+				cloneAllNews = JSON.parse(JSON.stringify(allNews));
+	    		cloneAllNews.forEach((val)=>{	
+		    		if(reg.test(val[1])){
+		    			val[1] = val[1].replace(inpVal, `<mark>${inpVal}</mark>`);
+		    			arrNews.push(val);
+		    		}
+	    		});
+			   	createSearchDom(arrNews);
+			   	arrNews = [];
+			}else {
+	    		newList[0].innerHTML = '';
+			}
+	    }
+	    function createSearchDom(data) {
+	    	newList[0].innerHTML = '';
+	    	let frage = document.createDocumentFragment();
+	    	for (var i = 0; i < data.length; i++) {
+	    		let li = document.createElement("li");
+	    		let a = document.createElement("a");
+	    		a.innerHTML = data[i][1];
+	    		a.setAttribute("href", `http://localhost:800/news/html/newsDetail.html?id=${data[i][0]}`);
+	    		a.setAttribute("target", '_blank');
+	    		li.setAttribute("class", 'list');
+	    		li.appendChild(a);
+	    		frage.appendChild(li);
+	    	}
+	    	newList[0].appendChild(frage);
+	    }
+	</script>
+</body>
+</html>

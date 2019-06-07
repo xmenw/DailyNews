@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>登录</title>
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/reset.css">
+	<link rel="icon" href="../static/news.png" type="image/x-icon" />
+ 	<link rel="shortcut icon" href="../static/news.png" type="image/x-icon"/>
+	<script src="../js/ajax.js"></script>
+	<style>
+		.container {
+			margin-top: 100px;
+		}
+		.form {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="form col-md-6 col-sm-8 col-xs-10 col-md-offset-3 col-sm-offset-2 col-xs-offset-1">
+			<h1>登录</h1>
+			<input type="hidden" name="ac" value="2"><br>
+			<input type="text" name="user" class="user form-control" autocomplete="off" placeholder="username"><br>
+			<input type="password" name="password" class="password form-control" placeholder="password"><br>
+			<button class="login btn btn-success btn-block">登录</button>
+			<button class="regist btn btn-info btn-block">注册</button>
+		</div>
+	</div>
+	<script>
+		let regist = document.querySelector(".regist");
+		let login = document.querySelector(".login");
+		regist.onclick = function (e) {
+			e.preventDefault();
+			location.href="./regist.html";
+		};
+		login.onclick = function (e) {
+			let user = document.querySelector(".user").value;
+			let password = document.querySelector(".password").value;
+			fn1(`../php/userUpdate.php`, `ac=2&user=${user}&password=${password}`).then(res => isToIndex(res));
+		};
+		function isToIndex(res) {
+			if (res) {
+				location.href="../index.html";
+			} else {
+				alert("账号密码错误");
+				document.querySelector(".user").value = '';
+				document.querySelector(".password").value = '';
+			}
+		}
+	</script>
+</body>
+</html>

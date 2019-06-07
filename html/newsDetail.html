@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/reset.css">
+	<link rel="icon" href="../static/news.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="../static/news.png" type="image/x-icon"/>
+	<script src="../js/ajax.js"></script>
+	<style>
+		h1 {
+			margin-bottom: 20px;
+			text-align: center;
+		}
+		img {
+			width: 600px;
+			height: 400px;
+			margin: 10px;
+		}
+		textarea {
+			display: block;
+			width: 100%;	
+			height: 70px;
+			resize: none;
+		}
+		.container {
+			padding-top: 20px;
+		}
+		.content {
+			text-indent: 2em;
+		}
+		.content .imgWrp{
+			text-align: center;
+		}
+		.footer {
+			margin: 30px 0;
+			text-align: right;
+			border-bottom: 1px solid black;	
+		}
+		#num {
+			color: #e56;
+		}
+		.comments {
+			margin-top: 10px;
+			margin-bottom: 80px;
+		}
+		.comments .diver {
+			text-align: center;
+		}
+		.comments .diver::before,
+		.comments .diver::after {
+			content: '';
+			display: inline-block;
+			width: 40%;
+			margin-right: 2%;
+			border: 1px solid #64a1d6;
+		}
+		.comments .diver::after {
+			margin-left: 2%;
+		}
+		.comments .comment {
+			position: relative;
+			height: 100px;
+			margin: 10px 0;
+			padding: 5px;
+			border: 1px solid black;
+		}
+		.comments .user {
+			position: absolute;
+			bottom: 5px;
+			right: 100px;
+			margin: 5px;
+			font-style: italic;
+			font-weight: bold;
+		}
+		.comments .time {
+			position: absolute;
+			right: 5px;
+			bottom: 5px;
+			margin: 5px;
+		}
+		.submit {
+			margin-top: 5px;
+		}
+		.show {
+			position: relative;
+		}
+		.showNum {
+			position: absolute;
+			bottom: 5px;
+			right: 10px;
+		}
+		.pages {
+			float: right;
+		}
+		.pages .page {
+			float: left;
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			line-height: 30px;
+			cursor: pointer;
+			border: 1px solid black;
+		}
+		.page.active {
+			background-color: #f46a51;
+		}
+		.left-col {
+			border-right: 1px solid #e1e1e1;
+		}
+		.right-col {
+			position: sticky;
+			top: 0px;
+			margin-top: 30px;
+		}
+		.right-col h2{
+			padding: 5px;
+			text-align: center;
+			margin-bottom: 10px;
+			border-bottom: 5px solid #f00;
+		}
+		.hot {
+			padding: 0;
+			margin: 0;
+		}
+		.hot li {
+			height: 30px;
+			line-height: 30px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			border-bottom: 1px solid #e1e1e1; 
+		}
+		.hot li span {
+			margin-right: 10px;
+		}
+		.hot li:nth-child(1){
+			color: #f00;
+		}
+		.hot li:nth-child(2){
+			color: #F30;
+		}
+
+		.hot li:nth-child(3){
+			color: #D42F;
+		}
+
+		.hot li:nth-child(4){
+			color: #D92F;
+		}
+
+		.hot li:nth-child(5){
+			color: #C93F;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="left-col col-lg-8">
+				<header>
+					<h1 class="title"></h1>
+				</header>
+				<article>
+					<div class="content"></div>
+				</article>
+			</div>
+			<aside>
+				<div class="right-col col-lg-4">
+					<h2>热点新闻</h2>
+					<ol class="hot">
+
+					</ol>				
+				</div>
+			</aside>
+		</div>
+		<footer>
+			<div class="footer">
+				阅读人数：<span id="num">0</span>
+			</div>
+			评论：
+			<div class="show">
+				<textarea name="comment" id="comment" maxlength="100" placeholder="请输入您的评论（100字）"></textarea>
+				<div class="showNum"><span class="num">0</span>/100</div>
+			</div>
+			<button class="submit btn btn-block btn-success">提交</button>
+			<div class="comments">
+				<div class="diver">网友评论展示区</div>
+				<ul>
+					
+				</ul>
+				<ul class="pages">
+					
+				</ul>
+			</div>
+		</footer>
+	</div>
+	<script>
+		let id = location.href.split("?")[1].split("=")[1]; /*查询得id*/
+		let frage = document.createDocumentFragment();
+		let title = document.querySelector(".title"); /*文章标题*/
+		let content = document.querySelector(".content"); /*文章内容*/
+		let commentsUl = document.querySelector(".comments ul"); /*评论列表*/
+		let submit = document.querySelector(".submit"); /*提交按钮*/
+		let pageTitle = document.querySelector("title"); /*title标签*/
+		let comment = document.querySelector("#comment"); /*评论*/
+		let commentNum = document.querySelector(".num"); /*评论字数*/
+		let num = document.querySelector("#num"); /*阅读人数*/
+		let pages = document.querySelector(".pages"); /*分页*/
+		let hotNews = document.querySelector(".hot"); /*热点新闻*/
+		let res; /*返回的数据*/
+		let begin = 0; /*开始页码*/
+
+		fn1(`../php/newDetail.php`, `id=${id}`)
+			.then(
+				data => {
+					createDom(data);
+					/*阅读人数+1*/
+					fn1(`../php/dbUtil/dbUpdate.php`,`id=${id}&num=${+data[0][5] + 1}`);
+				}
+			);
+		fn1(`../php/hotNews.php`)
+			.then(data => {
+					createHotNewsDom(data);
+				}
+			);
+		function createDom(data) {
+			res = data.concat();
+			if(!res[1]){
+				submit.setAttribute("disabled", "disabled");
+				comment.setAttribute("disabled", "disabled");
+			}
+			let arrText = data[0][2].split("//////");
+			let arrImgs = data[0][3].split(",");
+			let textLen = arrText.length,
+				arrLen = arrImgs.length;
+			let len = textLen > arrLen ? arrLen : textLen;
+			for (var i = 0; i < len; i++) {
+				let img = document.createElement("img");
+				let text = document.createTextNode(arrText[i]);
+				let div = document.createElement("div");
+				img.setAttribute("src", `.${arrImgs[i]}`);
+				div.setAttribute("class", "imgWrp")
+				div.appendChild(img);
+				content.appendChild(text);
+				content.appendChild(div);
+			}
+			/*判断是哪一个的长度*/
+			if(len === textLen){
+				/*放入剩余的图片*/
+				for (var i = len; i < arrLen; i++) {
+					let div = document.createElement("div");
+					let img = document.createElement("img");
+					img.setAttribute("src", `.${arrImgs[i]}`);
+					div.setAttribute("class", `imgWrp`);
+					div.appendChild(img);
+					content.appendChild(div);
+				}
+			}else {
+				/*放入剩余的文本*/
+				for (var i = len; i < textLen; i++) {
+					let text = document.createTextNode(arrText[i]);
+					content.appendChild(text);
+				}
+			}
+			pageTitle.innerText = data[0][1];
+			title.innerText = data[0][1];
+			num.innerText = data[0][5];
+			queryByPage(begin);
+		}
+		/*创建热点新闻*/
+		function createHotNewsDom(data){
+			let frage = document.createDocumentFragment();
+			for (var i = 0; i < data.length; i++) {
+				let li = document.createElement("li");
+				let a = document.createElement("a");
+				let span = document.createElement("span");
+				let spanNum = document.createElement("span");
+				span.innerText = i + 1;
+				spanNum.innerText = data[i][2];
+				a.setAttribute("href", `?id=${data[i][0]}`);
+				a.innerText = data[i][1];
+				li.appendChild(span);
+				li.appendChild(a);
+				frage.appendChild(li);
+			}
+			hotNews.appendChild(frage);
+		}
+
+		comment.oninput = function () {
+			commentNum.innerText = this.value.length;
+		}
+
+		submit.onclick = click;
+
+		function click() {
+			if(!res[1]){
+				submit.setAttribute("disabled", "disabled");
+				comment.setAttribute("disabled", "disabled");
+				if (confirm("请您先登录")) {
+					location.href="./login.html";
+				}
+				return;
+			}
+			let text = comment.value.trim();
+			if(text == ''){
+				alert("评论内容不能为空");
+				return;
+			} else {
+				text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+				fn1(`../php/commentsUpdate.php`, `title=${title.innerText}&comment=${comment.value}&user=${res[1]}&date=${Date.now()}`)
+					.then(
+						data => { 
+							queryByPage(0);
+						}
+					);
+			}
+			comment.value = '';
+			commentNum.innerText = this.value.length;
+		}
+
+		/*查询评论*/
+		function queryByPage(begin) {
+			fn1(`../php/queryComments.php`, `begin=${begin}&title=${title.innerText}`)
+				.then(
+					data => { 
+						if (data.length > 0) {
+							commentsUl.innerHTML = '';
+							/*评论内容*/
+							insertComment(data, commentsUl);
+							/*页数*/
+							insertPages(data, pages, begin);
+						}
+					}
+				);
+		}
+		/*插入评论*/
+		function insertComment(data, el) {
+			for (var i = 0; i < data.length - 1; i++) {
+				let date = new Date(+data[i][4]);
+				let str = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`; 
+				let li = document.createElement("li");
+				li.setAttribute("class", "comment");
+				let spanUser = document.createElement("span");
+				spanUser.setAttribute("class", "user");
+				spanUser.innerText = data[i][3];
+				let spanTime = document.createElement("span");
+				spanTime.setAttribute("class", "time");
+				spanTime.innerText = str;
+				li.innerText = data[i][2];
+				li.appendChild(spanUser);
+				li.appendChild(spanTime);
+				el.appendChild(li);
+			}
+		}
+		/*插入页数*/
+		function insertPages(data, el, begin) {
+			pages.innerHTML = '';
+			for (var i = 0; i < data[data.length - 1]; i++) {
+				let li = document.createElement("li");
+				if(begin == i){
+					li.setAttribute("class", "active page");
+				}else {
+					li.setAttribute("class", "page");
+				}
+				li.innerText = i + 1;
+				el.appendChild(li);
+			}
+			pageAddClick();
+		}
+		function pageAddClick() {
+			let page = document.querySelectorAll(".page");
+			for (var i = 0; i < page.length; i++) {
+				page[i].onclick = (function (j) {
+					return function(){
+						if(j != begin){
+							pages.innerHTML = '';
+						    queryByPage(j);
+						    begin = j;
+						}
+					};
+				})(i);
+			}
+		}
+	</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>新闻列表</title>
+	<link rel="stylesheet" href="../css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/reset.css">
+	<link rel="icon" href="../static/news.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="../static/news.png" type="image/x-icon"/>
+	<script src="../js/ajax.js"></script>
+	<style>
+		h1 {
+			text-align: center;
+			margin-top: 10px;
+			margin-bottom: 20px;
+		}
+		button {
+			margin: 0 5px;
+			outline: none !important;
+			border: none !important;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>新闻列表</h1>
+		<table class="table table-hover table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>新闻标题</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+
+			</tbody>
+		</table>
+	</div>
+	<script>
+		let tb = document.getElementsByTagName("tbody")[0];
+		let frage = document.createDocumentFragment();
+		fn1("../php/queryAllNews.php")
+			.then(res=>{
+				if(res){
+					createDom(res);
+				} else {
+					alert("获取失败!");
+				}
+			});
+
+		function createDom(data) {
+			tb.innerHTML = '';
+			for (let i = 0, len = data.length; i < len; i++) {
+				let tr = document.createElement("tr");
+				let tdID = document.createElement("td");
+				let tdTitle = document.createElement("td");
+				let tdAction = document.createElement("td");
+				let buttonMod = document.createElement("button");
+				let buttonDel = document.createElement("button");
+
+				buttonMod.setAttribute("class", "buttonMod btn btn-sm btn-primary");
+				buttonDel.setAttribute("class", "buttonDel btn btn-sm btn-danger");
+				buttonMod.setAttribute("data-id", data[i][0]);
+				buttonDel.setAttribute("data-id", data[i][0]);
+				buttonMod.innerText = "修改";
+				buttonDel.innerText = "删除";
+				tdID.innerText = data[i][0];
+				tdTitle.innerText = data[i][1];
+
+				tdAction.appendChild(buttonMod);
+				tdAction.appendChild(buttonDel);
+				tr.appendChild(tdID);
+				tr.appendChild(tdTitle);
+				tr.appendChild(tdAction);
+				frage.appendChild(tr);
+			}
+			tb.appendChild(frage);
+			let btnDels = document.getElementsByClassName("buttonDel");
+			let btnMods = document.getElementsByClassName("buttonMod");
+
+			for (var i = 0; i < btnDels.length; i++) {
+				btnDels[i].onclick = function () {
+					delNew(this.getAttribute("data-id"));					
+				}
+			}
+			for (var i = 0; i < btnMods.length; i++) {
+				btnMods[i].onclick = function () {
+					location.href = `./updateNews.html?id=${this.getAttribute("data-id")}`;				
+				}
+			}
+		}
+
+		function delNew(id) {
+			fn1("../php/deleteNew.php", `id=${id}`)
+				.then(res=>{
+					if(res){
+						alert("删除成功");
+						fn1("../php/queryAllNews.php")
+							.then(res=>{
+								if(res){
+									createDom(res);
+								} else {
+									alert("获取失败!");
+								}
+							});
+					} else {
+						alert("删除失败!");
+					}
+				});
+		}
+	</script>
+</body>
+</html>
+
+
+
+
+
+
+
