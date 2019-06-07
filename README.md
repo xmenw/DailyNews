@@ -26,3 +26,30 @@
     1. 上传新闻。
     2. 修改新闻。
     3. 删除新闻。
+## 效果
++ 首页
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/index.JPG)
+
++ 新闻详情页
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/detail.JPG)
+
++ 评论
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/comment.JPG)
+
++ 登录
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/login.JPG)
+
++ 注册
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/rigist.JPG)
+
++ 后台管理
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/admin.JPG)
+
++ 添加新闻
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/addnews.JPG)
+
++ 修改新闻
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/modify.JPG)
+
++ 新闻列表
+![image](https://github.com/xmenw/DailyNews/blob/master/newsImage/newslist.JPG)
